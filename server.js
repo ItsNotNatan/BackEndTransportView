@@ -1,31 +1,31 @@
+// server.js - Versão Corrigida
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
 
-// Importando as rotas
+// 1. Importando as rotas
 const transporteRoutes = require('./src/routes/transporteRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 
-const app = express();
+// 2. INICIALIZANDO O APP (Isso tem que vir antes de qualquer 'app.use')
+const app = express(); 
 
+// 3. MIDDLEWARES GLOBAIS
 app.use(cors());
 app.use(express.json());
 
-// Apontando a rota base para os arquivos de rotas
-app.use('/api/admin/transportes', transporteRoutes); // 1. Rota para a Tabela do Admin
-app.use('/api', transporteRoutes);                   // 2. Rota para o Cliente enviar formulários (Voltou!)
-app.use('/api', authRoutes);                         // 3. Rota para o Admin fazer o Login
+// 4. DEFINIÇÃO DAS ROTAS (Prefixos limpos para evitar o erro 404)
+// O login fica em: http://localhost:3001/api/auth/login
+app.use('/api/auth', authRoutes); 
 
-// Iniciando o servidor
-const PORT = 3001; 
+// O admin fica em: http://localhost:3001/api/admin/transportes
+app.use('/api', transporteRoutes); 
+
+// 5. INICIALIZAÇÃO DO SERVIDOR
+const PORT = process.env.PORT || 3001;
 const server = http.createServer(app);
 
-server.on('error', (erro) => {
-  console.error("❌ ERRO NO SERVIDOR:", erro.message);
-});
-
-server.listen(PORT, () => {
-  console.log(`✅ Servidor rodando firmemente na porta http://localhost:${PORT}`);
-  console.log(`📡 Aguardando requisições do Cliente e do Admin...`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
